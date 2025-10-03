@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image → Text Converter</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Tesseract.js CDN -->
+  <script src="https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🖼️ → 📝 Image to Text Converter</h1>
+      <p>Upload an image or paste one — extract editable text instantly using Tesseract.js (client-side).</p>
+    </header>
+
+    <main>
+      <section class="uploader">
+        <div id="dropZone" class="drop">Drop image here or click to choose</div>
+        <input id="fileInput" type="file" accept="image/*" />
+        <div class="controls">
+          <select id="langSelect">
+            <option value="eng" selected>English (eng)</option>
+            <option value="hin">Hindi (hin)</option>
+            <option value="spa">Spanish (spa)</option>
+            <option value="fra">French (fra)</option>
+          </select>
+          <button id="extractBtn" class="primary">Extract Text</button>
+          <button id="clearBtn">Clear</button>
+        </div>
+        <div id="previewWrap">
+          <img id="preview" alt="preview image"/>
+        </div>
+      </section>
+
+      <section class="result">
+        <div class="actions">
+          <button id="copyBtn">📋 Copy</button>
+          <button id="downloadBtn">📥 Download TXT</button>
+        </div>
+        <textarea id="result" placeholder="Extracted text will appear here..." spellcheck="true"></textarea>
+      </section>
+
+      <section class="demo">
+        <h3>Demo screenshot</h3>
+        <img src="demo_screenshot.png" alt="Demo screenshot" />
+      </section>
+    </main>
+
+    <footer>
+      <small>Works offline in the browser (uses client CPU). For best results use high-contrast images.</small>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

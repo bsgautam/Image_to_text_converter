@@ -1,31 +1,20 @@
-# 🖼️➡️📄 Image to Text Converter
+# Image to Text Converter (Web App)
 
-Convert images into editable text instantly using **Tesseract.js** right in your browser!  
-No server needed, everything runs locally ⚡.
+A simple client-side Image → Text converter using **Tesseract.js**. Drag & drop images, extract editable text right in the browser. No server required.
 
----
+## Features
+- Drag & drop or file picker image input
+- Client-side OCR with Tesseract.js
+- Language selection (English, Hindi, Spanish, French — add more via language codes)
+- Preview image, copy text, download text file
+- Demo screenshot included
 
-## ✨ Features
-- 📤 Upload or drag & drop images (JPG, PNG, etc.)
-- 🔍 Extract text using **OCR (Optical Character Recognition)**
-- 📝 Copy text to clipboard with one click
-- 💾 Download extracted text as `.txt` file
-- 🌐 Works **offline** (in browser)
-- 📱 Responsive design (mobile & desktop friendly)
+## How to run
+1. Unzip the folder.
+2. Open `index.html` in a modern browser (Chrome/Edge/Firefox).
+3. Click the drop area or drag an image, then click **Extract Text**.
 
----
+## Notes
+- OCR runs locally in the browser and uses CPU; large images may take time.
+- To add more languages, include the appropriate Tesseract language traineddata (Tesseract will fetch it automatically when supported).
 
-## 📸 Demo
-![Demo Screenshot](demo_screenshot.png)
-
----
-
-## 🚀 How to Use
-1. Open `index.html` in your browser 🌍  
-2. Upload or drag & drop an image 📷  
-3. Wait for OCR to process ⏳  
-4. Copy or download the extracted text ✍️  
-
----
-
-## 📂 Project Structure
