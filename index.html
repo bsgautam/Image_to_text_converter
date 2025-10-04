@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to Text with Hindi Translation</title>
+    <title>Advanced Image to Text Tool</title>
+    <!-- Cropper.js CSS Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
+    <!-- Main Application Container -->
     <div class="app">
         <header>
-            <h1>Image to Text Extractor</h1>
-            <p>Extract text from images locally and translate it to Hindi.</p>
+            <h1>Advanced Image to Text Tool</h1>
+            <p>Extract, translate, and interact with text from images or your live camera.</p>
             <div class="header-buttons">
                 <button id="historyBtn" class="primary">History</button>
                 <button id="darkModeToggle" class="primary">Dark Mode</button>
@@ -20,25 +24,24 @@
         </header>
 
         <main>
+            <!-- Left Panel: Image Input -->
             <div class="uploader">
-                <div id="dropZone" class="drop">
-                    <p>Drop an image here or click to upload</p>
-                    <input type="file" id="fileInput" accept="image/*">
+                <div class="input-options">
+                    <button id="uploadBtn" class="primary">Upload Image</button>
+                    <button id="cameraBtn" class="primary">Use Camera</button>
                 </div>
-                <div class="controls">
-                    <select id="langSelect">
-                        <option value="eng" selected>English</option>
-                    </select>
-                    <button id="extractBtn" class="primary">Extract Text</button>
-                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
                 <div id="previewWrap">
-                    <img id="preview" src="" alt="Image preview">
+                    <p>Your selected image will appear in the crop tool.</p>
+                    [Image of a camera lens and a file icon]
                 </div>
             </div>
 
+            <!-- Right Panel: Results -->
             <div class="result-container">
                 <div class="result">
-                    <textarea id="result" placeholder="Extracted text will appear here..."></textarea>
+                    <!-- Interactive result area -->
+                    <div id="result" class="editable-div" contenteditable="true" spellcheck="false" placeholder="Extracted text will appear here..."></div>
                     <div class="textarea-footer">
                         <div id="resultCharCount" class="char-count">0 characters</div>
                         <div class="actions">
@@ -50,21 +53,16 @@
                     </div>
                 </div>
 
+                <!-- Re-integrated Translation Section -->
                 <div class="translation-section">
-                    <textarea id="translatedResult" placeholder="Translation will appear here..."></textarea>
-                    <div class="textarea-footer">
-                        <div id="translatedCharCount" class="char-count">0 characters</div>
-                        <div class="actions">
-                            <button id="readTranslatedBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
-                            <button id="copyTranslationBtn" title="Copy Translation"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
-                            <button id="translateBtn" class="primary">Translate to Hindi</button>
-                        </div>
-                    </div>
+                    <button id="translateBtn" class="primary full-width">Translate to Hindi</button>
+                    <div id="translatedResult" class="translation-output" placeholder="Translation will appear here..."></div>
                 </div>
             </div>
         </main>
     </div>
     
+    <!-- History Panel -->
     <div id="historyPanel" class="history-panel">
         <div class="history-header">
             <h2>Translation History</h2>
@@ -73,14 +71,45 @@
         <ul id="historyList"></ul>
     </div>
 
+    <!-- Loading Overlay -->
     <div id="loader" class="loader-overlay">
         <div class="spinner"></div>
         <p>Recognizing text...</p>
     </div>
 
+    <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Cropper Modal -->
+    <div id="cropperModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Crop Image</h2>
+            <div class="cropper-container">
+                <img id="imageToCrop" src="">
+            </div>
+            <div class="modal-actions">
+                <button id="cancelCropBtn">Cancel</button>
+                <button id="confirmCropBtn" class="primary">Confirm & Extract</button>
+            </div>
+        </div>
+    </div>
 
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js'></script>
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Live Camera</h2>
+            <video id="cameraFeed" autoplay playsinline></video>
+            <div class="modal-actions">
+                <button id="cancelCameraBtn">Cancel</button>
+                <button id="captureBtn" class="primary">Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <!-- Main Application Logic -->
     <script src="app.js"></script>
 </body>
 </html>

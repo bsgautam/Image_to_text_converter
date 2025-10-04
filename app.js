@@ -1,167 +1,248 @@
-// --- DOM Element Selection ---
-const fileInput = document.getElementById('fileInput');
-const dropZone = document.getElementById('dropZone');
-const preview = document.getElementById('preview');
-const extractBtn = document.getElementById('extractBtn');
-const result = document.getElementById('result');
-const copyBtn = document.getElementById('copyBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const clearBtn = document.getElementById('clearBtn');
-const langSelect = document.getElementById('langSelect');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const translateBtn = document.getElementById('translateBtn');
-const translatedResult = document.getElementById('translatedResult');
-const copyTranslationBtn = document.getElementById('copyTranslationBtn');
-const readOriginalBtn = document.getElementById('readOriginalBtn');
-const readTranslatedBtn = document.getElementById('readTranslatedBtn');
-const historyBtn = document.getElementById('historyBtn');
-const historyPanel = document.getElementById('historyPanel');
-const historyList = document.getElementById('historyList');
-const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-// NEW: Selectors for new elements
-const loader = document.getElementById('loader');
-const toastContainer = document.getElementById('toastContainer');
-const resultCharCount = document.getElementById('resultCharCount');
-const translatedCharCount = document.getElementById('translatedCharCount');
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Element Selection ---
+    const uploadBtn = document.getElementById('uploadBtn');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const fileInput = document.getElementById('fileInput');
+    const resultDiv = document.getElementById('result');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    // Modals & Overlays
+    const cropperModal = document.getElementById('cropperModal');
+    const cameraModal = document.getElementById('cameraModal');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const confirmCropBtn = document.getElementById('confirmCropBtn');
+    const cancelCropBtn = document.getElementById('cancelCropBtn');
+    const cameraFeed = document.getElementById('cameraFeed');
+    const captureBtn = document.getElementById('captureBtn');
+    const cancelCameraBtn = document.getElementById('cancelCameraBtn');
+    const loader = document.getElementById('loader');
+    const toastContainer = document.getElementById('toastContainer');
+    // Action Buttons
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const readOriginalBtn = document.getElementById('readOriginalBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    // Translation
+    const translateBtn = document.getElementById('translateBtn');
+    const translatedResultDiv = document.getElementById('translatedResult');
+    // History
+    const historyBtn = document.getElementById('historyBtn');
+    const historyPanel = document.getElementById('historyPanel');
+    const historyList = document.getElementById('historyList');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    // Character Counters
+    const resultCharCount = document.getElementById('resultCharCount');
+    
+    let cropper = null;
+    let cameraStream = null;
 
-let selectedFile = null;
+    // --- Event Listeners ---
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    cameraBtn.addEventListener('click', startCamera);
+    darkModeToggle.addEventListener("click", () => document.body.classList.toggle("dark-mode"));
+    
+    // Modal Controls
+    cancelCropBtn.addEventListener('click', closeCropper);
+    confirmCropBtn.addEventListener('click', processCroppedImage);
+    cancelCameraBtn.addEventListener('click', closeCamera);
+    captureBtn.addEventListener('click', captureImage);
 
-// --- Event Listeners ---
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('drag');
-  handleFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-darkModeToggle.addEventListener("click", () => document.body.classList.toggle("dark-mode"));
-extractBtn.addEventListener('click', performOCR);
-clearBtn.addEventListener('click', clearAll);
+    // Action Controls
+    clearBtn.addEventListener('click', clearAll);
+    copyBtn.addEventListener('click', () => copyToClipboard(resultDiv.textContent, 'Original text copied!'));
+    downloadBtn.addEventListener('click', downloadText);
+    readOriginalBtn.addEventListener('click', () => speakText(resultDiv.textContent, 'en-US'));
+    resultDiv.addEventListener('input', () => updateCharCount(resultDiv, resultCharCount));
 
-// --- NEW: Character Count Listeners ---
-result.addEventListener('input', () => updateCharCount(result, resultCharCount));
-translatedResult.addEventListener('input', () => updateCharCount(translatedResult, translatedCharCount));
+    // Translation & History Controls
+    translateBtn.addEventListener('click', performTranslation);
+    historyBtn.addEventListener('click', () => historyPanel.classList.toggle('show'));
+    clearHistoryBtn.addEventListener('click', clearHistory);
 
-// --- Core Functions ---
-function handleFile(file) {
-  if (!file || !file.type.startsWith('image/')) {
-    showToast('Please select a valid image file.');
-    return;
-  }
-  selectedFile = file;
-  const url = URL.createObjectURL(file);
-  preview.src = url;
-  preview.onload = () => URL.revokeObjectURL(url);
-}
+    // --- Camera Functions ---
+    async function startCamera() {
+        try {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                cameraFeed.srcObject = cameraStream;
+                cameraModal.classList.add('show');
+            } else {
+                showToast('Your browser does not support camera access.');
+            }
+        } catch (err) {
+            console.error("Camera Error:", err);
+            showToast('Could not access the camera. Please grant permission.');
+        }
+    }
 
-async function performOCR() {
-  if (!selectedFile) {
-    showToast('Please select an image first.');
-    return;
-  }
-  loader.classList.add('show'); // Show loader
-  try {
-    const worker = await Tesseract.createWorker();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    const { data: { text } } = await worker.recognize(selectedFile);
-    result.value = text;
-    updateCharCount(result, resultCharCount); // Update count after OCR
-    await worker.terminate();
-  } catch (err) {
-    console.error(err);
-    result.value = 'Error: ' + err.message;
-  } finally {
-    loader.classList.remove('show'); // Hide loader
-  }
-}
+    function captureImage() {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraFeed.videoWidth;
+        canvas.height = cameraFeed.videoHeight;
+        canvas.getContext('2d').drawImage(cameraFeed, 0, 0);
+        closeCamera();
+        canvas.toBlob(blob => handleFile(blob));
+    }
 
-function clearAll() {
-  preview.src = '';
-  selectedFile = null;
-  result.value = '';
-  translatedResult.value = '';
-  fileInput.value = '';
-  updateCharCount(result, resultCharCount);
-  updateCharCount(translatedResult, translatedCharCount);
-  speechSynthesis.cancel();
-  showToast('Cleared all fields.');
-}
+    function closeCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+        cameraModal.classList.remove('show');
+    }
 
-// --- NEW: Toast Notification Function ---
-function showToast(message) {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = message;
-  toastContainer.appendChild(toast);
-  // Animate in
-  setTimeout(() => toast.classList.add('show'), 10);
-  // Animate out and remove
-  setTimeout(() => {
-    toast.classList.remove('show');
-    toast.addEventListener('transitionend', () => toast.remove());
-  }, 3000);
-}
+    // --- Cropper Functions ---
+    function handleFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imageToCrop.src = e.target.result;
+            cropperModal.classList.add('show');
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(imageToCrop, { viewMode: 1, background: false, autoCropArea: 0.9 });
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = ''; // Reset file input
+    }
 
-// --- NEW: Character Count Function ---
-function updateCharCount(textarea, counterElement) {
-    const count = textarea.value.length;
-    counterElement.textContent = `${count} characters`;
-}
+    function closeCropper() {
+        cropperModal.classList.remove('show');
+        if (cropper) cropper.destroy();
+    }
 
-// --- Translation, History, and Speech Synthesis (with updated notifications) ---
-const translationDictionary = { "hello": "नमस्ते", "good morning": "शुभ प्रभात", "how are you": "आप कैसे हैं", "thank you": "धन्यवाद", "please": "कृपया", "yes": "हाँ", "no": "नहीं" };
-function translateToHindi(text) { /* Unchanged */ return text.toLowerCase().split(/[\s\n]+/).map(w => translationDictionary[w.replace(/[.,!?;:"']/g, '')] || w).join(' '); }
-translateBtn.addEventListener('click', () => {
-    const textToTranslate = result.value.trim();
-    if (!textToTranslate) return showToast('Nothing to translate.');
-    translatedResult.value = 'Translating...';
-    setTimeout(() => {
-        const translation = translateToHindi(textToTranslate);
-        translatedResult.value = translation;
-        updateCharCount(translatedResult, translatedCharCount);
-        saveToHistory(textToTranslate, translation);
-    }, 500);
-});
+    function processCroppedImage() {
+        if (!cropper) return;
+        const canvas = cropper.getCroppedCanvas();
+        closeCropper();
+        performOCR(canvas);
+    }
 
-copyBtn.addEventListener('click', () => copyToClipboard(result.value, 'Original text copied!'));
-copyTranslationBtn.addEventListener('click', () => copyToClipboard(translatedResult.value, 'Translated text copied!'));
-async function copyToClipboard(text, message) {
-    if (!text) return;
-    try {
-        await navigator.clipboard.writeText(text);
-        showToast(message);
-    } catch (e) { showToast('Failed to copy.'); }
-}
+    // --- Core OCR & Interactive Text ---
+    async function performOCR(imageSource) {
+        loader.classList.add('show');
+        try {
+            const { data: { text } } = await Tesseract.recognize(imageSource, 'eng');
+            const interactiveText = createInteractiveText(text);
+            resultDiv.innerHTML = interactiveText;
+            updateCharCount(resultDiv, resultCharCount);
+        } catch (err) {
+            console.error(err);
+            resultDiv.textContent = 'Error during text recognition.';
+            showToast('Could not recognize text.');
+        } finally {
+            loader.classList.remove('show');
+        }
+    }
 
-downloadBtn.addEventListener('click', () => {
-    if (!result.value) return;
-    const blob = new Blob([result.value], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'extracted.txt';
-    a.click();
-});
+    function createInteractiveText(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+        const phoneRegex = /(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?[\d\s-]{7,10}/g;
+        return text
+            .replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+            .replace(emailRegex, '<a href="mailto:$1">$1</a>')
+            .replace(phoneRegex, '<a href="tel:$&">$&</a>');
+    }
 
-function speakText(text, lang) {
-  speechSynthesis.cancel();
-  if (!text) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  speechSynthesis.speak(utterance);
-}
-readOriginalBtn.addEventListener('click', () => speakText(result.value, 'en-US'));
-readTranslatedBtn.addEventListener('click', () => speakText(translatedResult.value, 'hi-IN'));
+    // --- Translation ---
+    const translationDictionary = { "hello": "नमस्ते", "good morning": "शुभ प्रभात", "how are you": "आप कैसे हैं", "thank you": "धन्यवाद", "please": "कृपया", "yes": "हाँ", "no": "नहीं", "love": "प्यार", "friend": "दोस्त"};
+    function performTranslation() {
+        const textToTranslate = resultDiv.textContent.trim();
+        if (!textToTranslate) return showToast('Nothing to translate.');
+        const translatedText = textToTranslate.toLowerCase().split(/[\s\n]+/).map(w => translationDictionary[w.replace(/[.,!?;:"']/g, '')] || w).join(' ');
+        translatedResultDiv.textContent = translatedText;
+        saveToHistory(resultDiv.innerHTML, translatedText); // Save original HTML and translated text
+    }
 
-function getHistory() { return JSON.parse(localStorage.getItem('translationHistory')) || []; }
-function renderHistory() { /* Unchanged */ }
-function saveToHistory(original, translated) { /* Unchanged */ }
-historyBtn.addEventListener('click', () => historyPanel.classList.toggle('show'));
-clearHistoryBtn.addEventListener('click', () => {
-    localStorage.removeItem('translationHistory');
+    // --- Action & Helper Functions ---
+    function clearAll() {
+        resultDiv.innerHTML = '';
+        translatedResultDiv.textContent = '';
+        updateCharCount(resultDiv, resultCharCount);
+        speechSynthesis.cancel();
+        showToast('Cleared all fields.');
+    }
+
+    function updateCharCount(element, counterElement) {
+        const count = element.textContent.length;
+        counterElement.textContent = `${count} characters`;
+    }
+
+    async function copyToClipboard(text, message) {
+        if (!text) return;
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast(message);
+        } catch (e) { showToast('Failed to copy.'); }
+    }
+
+    function downloadText() {
+        const text = resultDiv.textContent;
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'extracted-text.txt';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function speakText(text, lang) {
+        speechSynthesis.cancel();
+        if (!text) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        speechSynthesis.speak(utterance);
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    }
+
+    // --- History Logic ---
+    function getHistory() { return JSON.parse(localStorage.getItem('translationHistory')) || []; }
+    
+    function renderHistory() {
+        const history = getHistory();
+        historyList.innerHTML = history.length ? '' : '<li><div class="original-text">No history yet.</div></li>';
+        history.forEach(item => {
+            const li = document.createElement('li');
+            // Display plain text in history panel for cleanliness
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = item.originalHTML;
+            li.innerHTML = `<div class="original-text">${tempDiv.textContent}</div><div class="translated-text">${item.translated}</div>`;
+            li.addEventListener('click', () => {
+                resultDiv.innerHTML = item.originalHTML; // Restore with links
+                translatedResultDiv.textContent = item.translated;
+                updateCharCount(resultDiv, resultCharCount);
+                historyPanel.classList.remove('show');
+            });
+            historyList.appendChild(li);
+        });
+    }
+
+    function saveToHistory(originalHTML, translated) {
+        let history = getHistory();
+        history.unshift({ originalHTML, translated });
+        if (history.length > 20) history = history.slice(0, 20);
+        localStorage.setItem('translationHistory', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function clearHistory() {
+        localStorage.removeItem('translationHistory');
+        renderHistory();
+        showToast('History cleared.');
+    }
+
+    // Initial render of history on page load
     renderHistory();
-    showToast('History cleared.');
 });
-document.addEventListener('DOMContentLoaded', renderHistory);
