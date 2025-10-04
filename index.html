@@ -13,7 +13,10 @@
         <header>
             <h1>Image to Text Extractor</h1>
             <p>Extract text from images locally and translate it to Hindi.</p>
-            <button id="darkModeToggle" class="primary" style="position: absolute; top: 20px; right: 20px;">Toggle Dark Mode</button>
+            <div class="header-buttons">
+                <button id="historyBtn" class="primary">History</button>
+                <button id="darkModeToggle" class="primary">Dark Mode</button>
+            </div>
         </header>
 
         <main>
@@ -36,33 +39,46 @@
             <div class="result-container">
                 <div class="result">
                     <textarea id="result" placeholder="Extracted text will appear here..."></textarea>
-                    <div class="actions">
-                        <button id="readOriginalBtn" title="Read Aloud">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><path d="M533.6 32.5C598.5 85.3 640 165.8 640 256s-41.5 170.8-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C483.8 332.6 504 296.3 504 256s-20.2-76.6-61.3-101.2c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
-                        </button>
-                        <button id="copyBtn">Copy Text</button>
-                        <button id="downloadBtn">Download .txt</button>
-                        <button id="clearBtn">Clear</button>
+                    <div class="textarea-footer">
+                        <div id="resultCharCount" class="char-count">0 characters</div>
+                        <div class="actions">
+                            <button id="readOriginalBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                            <button id="copyBtn" title="Copy Text"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
+                            <button id="downloadBtn" title="Download .txt"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg></button>
+                            <button id="clearBtn" title="Clear All"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="translation-section">
-                    <div class="actions">
-                        <button id="readTranslatedBtn" title="Read Aloud">
-                           <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><path d="M533.6 32.5C598.5 85.3 640 165.8 640 256s-41.5 170.8-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C483.8 332.6 504 296.3 504 256s-20.2-76.6-61.3-101.2c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
-                        </button>
-                        <button id="translateBtn" class="primary">Translate to Hindi</button>
-                        <button id="copyTranslationBtn">Copy Translation</button>
-                    </div>
                     <textarea id="translatedResult" placeholder="Translation will appear here..."></textarea>
+                    <div class="textarea-footer">
+                        <div id="translatedCharCount" class="char-count">0 characters</div>
+                        <div class="actions">
+                            <button id="readTranslatedBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                            <button id="copyTranslationBtn" title="Copy Translation"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
+                            <button id="translateBtn" class="primary">Translate to Hindi</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
-
-        <footer>
-            <p>Powered by Tesseract.js, running 100% in your browser.</p>
-        </footer>
     </div>
+    
+    <div id="historyPanel" class="history-panel">
+        <div class="history-header">
+            <h2>Translation History</h2>
+            <button id="clearHistoryBtn">Clear All</button>
+        </div>
+        <ul id="historyList"></ul>
+    </div>
+
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <p>Recognizing text...</p>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js'></script>
     <script src="app.js"></script>
