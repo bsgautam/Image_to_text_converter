@@ -48,6 +48,14 @@ body.dark-mode #result, body.dark-mode #translatedResult {
 }
 header h1{margin:0;font-size:1.35rem}
 header p{margin:6px 0 18px;color:var(--muted)}
+/* NEW: Header button container */
+.header-buttons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+}
 main{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .uploader{padding:12px;border-radius:8px;border:1px dashed #e6e9ef;background:#fbfdff}
 .drop{padding:18px;border-radius:8px;background:linear-gradient(90deg,#fff,#f7fbff);text-align:center;cursor:pointer;border:1px dashed #d1d5db}
@@ -81,10 +89,76 @@ footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
   font-size: 1.1em;
 }
 
-/* NEW: Style for the SVG icon inside the read aloud buttons */
 .actions button svg {
     fill: currentColor;
     width: 16px;
     height: 16px;
     vertical-align: middle;
+}
+
+/* NEW: HISTORY PANEL STYLES */
+.history-panel {
+    position: fixed;
+    top: 0;
+    right: -350px; /* Start off-screen */
+    width: 350px;
+    height: 100%;
+    background: var(--card);
+    box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+.history-panel.show {
+    right: 0; /* Slide in */
+}
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e6e9ef;
+}
+.history-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+#historyList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+#historyList li {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e6e9ef;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#historyList li:hover {
+    background-color: var(--bg);
+}
+#historyList .original-text {
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-family: ui-monospace, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--muted);
+}
+#historyList .translated-text {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 1.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+body.dark-mode .history-panel {
+    box-shadow: -4px 0 15px rgba(255,255,255,0.05);
+}
+body.dark-mode .history-header, body.dark-mode #historyList li {
+    border-color: #333;
 }
