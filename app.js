@@ -7,6 +7,12 @@ const copyBtn = document.getElementById('copyBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const clearBtn = document.getElementById('clearBtn');
 const langSelect = document.getElementById('langSelect');
+const darkModeToggle = document.getElementById('darkModeToggle');
+
+// Get references to the new translation elements
+const translateBtn = document.getElementById('translateBtn');
+const translatedResult = document.getElementById('translatedResult');
+const copyTranslationBtn = document.getElementById('copyTranslationBtn');
 
 let selectedFile = null;
 
@@ -24,7 +30,8 @@ fileInput.addEventListener('change', (e) => {
   const f = e.target.files[0];
   if (f) handleFile(f);
 });
-document.getElementById("darkModeToggle").addEventListener("click", () => {
+
+darkModeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
 });
 
@@ -41,10 +48,9 @@ extractBtn.addEventListener('click', async () => {
   result.value = 'Recognizing text... (this runs locally in your browser)';
   const lang = langSelect.value || 'eng';
   try {
-    const worker = Tesseract.createWorker({
+    const worker = await Tesseract.createWorker({
       logger: m => console.log(m)
     });
-    await worker.load();
     await worker.loadLanguage(lang);
     await worker.initialize(lang);
     const { data: { text } } = await worker.recognize(selectedFile);
@@ -78,4 +84,61 @@ clearBtn.addEventListener('click', () => {
   selectedFile = null;
   result.value = '';
   fileInput.value = '';
+  translatedResult.value = ''; // Clear translation result as well
+});
+
+// --- TRANSLATION LOGIC ---
+
+// Sample translation dictionary
+const translationDictionary = {
+    "hello": "नमस्ते", "good morning": "शुभ प्रभात", "how are you": "आप कैसे हैं",
+    "thank you": "धन्यवाद", "please": "कृपया", "yes": "हाँ", "no": "नहीं",
+    "water": "पानी", "food": "खाना", "friend": "दोस्त", "family": "परिवार",
+    "love": "प्यार", "peace": "शांति", "beautiful": "सुंदर", "india": "भारत",
+    "language": "भाषा", "translate": "अनुवाद करना", "computer": "कंप्यूटर",
+    "internet": "इंटरनेट", "mobile": "मोबाइल", "book": "किताब", "pen": "कलम",
+    "school": "स्कूल", "teacher": "शिक्षक", "student": "छात्र", "house": "घर",
+    "car": "कार", "tree": "पेड़", "sun": "सूरज", "moon": "चाँद", "star": "तारा"
+};
+
+// Function to translate English text to Hindi
+function translateToHindi(text) {
+    if (!text) return '';
+    
+    // Simple word-by-word translation for demo
+    // It splits by space and newline to handle multi-line text from OCR
+    const words = text.toLowerCase().split(/[\s\n]+/); 
+    const translatedText = words.map(word => {
+        // Remove punctuation for better matching
+        const cleanWord = word.replace(/[.,!?;:"']/g, '');
+        return translationDictionary[cleanWord] || word;
+    }).join(' ');
+
+    return translatedText;
+}
+
+// Event listener for the translate button
+translateBtn.addEventListener('click', () => {
+    const textToTranslate = result.value;
+    if (!textToTranslate || textToTranslate.startsWith('Recognizing text...')) {
+        return alert('Please extract some text from an image first.');
+    }
+    
+    translatedResult.value = 'Translating...';
+    // Simulate a small delay
+    setTimeout(() => {
+        const translation = translateToHindi(textToTranslate);
+        translatedResult.value = translation;
+    }, 500);
+});
+
+// Event listener for copying the translated text
+copyTranslationBtn.addEventListener('click', async () => {
+    if (!translatedResult.value || translatedResult.value === 'Translating...') return;
+    try {
+        await navigator.clipboard.writeText(translatedResult.value);
+        alert('Translated text copied to clipboard!');
+    } catch (e) {
+        alert('Unable to copy: ' + e.message);
+    }
 });
