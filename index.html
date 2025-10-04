@@ -4,9 +4,301 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Image → Text Converter</title>
-  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Tesseract.js CDN -->
   <script src="https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #ffffff;
+      --bg-secondary: #f9fafb;
+      --bg-tertiary: #f3f4f6;
+      --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    .dark-mode {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #34d399;
+      --accent: #fbbf24;
+      --text: #f9fafb;
+      --text-light: #d1d5db;
+      --bg: #111827;
+      --bg-secondary: #1f2937;
+      --bg-tertiary: #374151;
+      --border: #4b5563;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      transition: var(--transition);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      font-size: 1.125rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    section {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .uploader {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .drop {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: var(--transition);
+      background-color: var(--bg-tertiary);
+    }
+
+    .drop:hover {
+      border-color: var(--primary);
+      background-color: var(--bg);
+    }
+
+    .drop.highlight {
+      border-color: var(--primary);
+      background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    select, button {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    select {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button.primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    button.primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    button.secondary {
+      background-color: var(--bg-tertiary);
+    }
+
+    button.secondary:hover {
+      background-color: var(--border);
+    }
+
+    #previewWrap {
+      display: none;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    #preview {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .result {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      resize: none;
+      transition: var(--transition);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .demo {
+      grid-column: 1 / -1;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .demo h3 {
+      margin-bottom: 1rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .demo img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+
+    .progress-container {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .status {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      background-color: var(--secondary);
+      color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -17,7 +309,12 @@
 
     <main>
       <section class="uploader">
-        <div id="dropZone" class="drop">Drop image here or click to choose</div>
+        <div id="dropZone" class="drop">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">📁</div>
+          <p><strong>Drop image here</strong></p>
+          <p>or click to choose from your device</p>
+          <p style="font-size: 0.875rem; margin-top: 0.5rem;">Supports JPG, PNG, GIF, BMP</p>
+        </div>
         <input id="fileInput" type="file" accept="image/*" />
         <div class="controls">
           <select id="langSelect">
@@ -25,11 +322,29 @@
             <option value="hin">Hindi (hin)</option>
             <option value="spa">Spanish (spa)</option>
             <option value="fra">French (fra)</option>
+            <option value="deu">German (deu)</option>
+            <option value="jpn">Japanese (jpn)</option>
+            <option value="kor">Korean (kor)</option>
+            <option value="chi_sim">Chinese Simplified (chi_sim)</option>
           </select>
-          <button id="extractBtn" class="primary">Extract Text</button>
-          <button id="darkModeToggle">🌙 Dark Mode</button>
-          <button id="clearBtn">Clear</button>
+          <button id="extractBtn" class="primary">
+            <span>🔍</span> Extract Text
+          </button>
+          <button id="darkModeToggle" class="secondary">
+            <span>🌙</span> Dark Mode
+          </button>
+          <button id="clearBtn" class="secondary">
+            <span>🗑️</span> Clear
+          </button>
         </div>
+        
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+          </div>
+          <div class="status" id="progressStatus">Initializing...</div>
+        </div>
+        
         <div id="previewWrap">
           <img id="preview" alt="preview image"/>
         </div>
@@ -37,23 +352,219 @@
 
       <section class="result">
         <div class="actions">
-          <button id="copyBtn">📋 Copy</button>
-          <button id="downloadBtn">📥 Download TXT</button>
+          <button id="copyBtn" class="secondary">
+            <span>📋</span> Copy
+          </button>
+          <button id="downloadBtn" class="secondary">
+            <span>📥</span> Download TXT
+          </button>
         </div>
         <textarea id="result" placeholder="Extracted text will appear here..." spellcheck="true"></textarea>
       </section>
 
       <section class="demo">
-        <h3>Demo screenshot</h3>
-        <img src="demo_screenshot.png" alt="Demo screenshot" />
+        <h3>Try with this example image</h3>
+        <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Demo screenshot" />
       </section>
     </main>
 
     <footer>
-      <small>Works offline in the browser (uses client CPU). For best results use high-contrast images.</small>
+      <small>Works offline in the browser (uses client CPU). For best results use high-contrast images with clear text.</small>
     </footer>
   </div>
 
-  <script src="app.js"></script>
+  <div class="notification" id="notification">Text copied to clipboard!</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const previewWrap = document.getElementById('previewWrap');
+      const preview = document.getElementById('preview');
+      const extractBtn = document.getElementById('extractBtn');
+      const result = document.getElementById('result');
+      const copyBtn = document.getElementById('copyBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const langSelect = document.getElementById('langSelect');
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const progressStatus = document.getElementById('progressStatus');
+      const notification = document.getElementById('notification');
+
+      // Current state
+      let currentImage = null;
+      let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+      // Initialize dark mode
+      if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<span>☀️</span> Light Mode';
+      }
+
+      // Event Listeners
+      dropZone.addEventListener('click', () => fileInput.click());
+      
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('highlight');
+      });
+      
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('highlight');
+      });
+      
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('highlight');
+        
+        if (e.dataTransfer.files.length) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+      
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+          handleFile(e.target.files[0]);
+        }
+      });
+      
+      extractBtn.addEventListener('click', extractText);
+      copyBtn.addEventListener('click', copyText);
+      downloadBtn.addEventListener('click', downloadText);
+      clearBtn.addEventListener('click', clearAll);
+      darkModeToggle.addEventListener('click', toggleDarkMode);
+
+      // Functions
+      function handleFile(file) {
+        if (!file.type.match('image.*')) {
+          showNotification('Please select an image file');
+          return;
+        }
+        
+        currentImage = file;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          previewWrap.style.display = 'block';
+          result.value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function extractText() {
+        if (!currentImage) {
+          showNotification('Please select an image first');
+          return;
+        }
+        
+        const lang = langSelect.value;
+        
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressStatus.textContent = 'Initializing Tesseract...';
+        
+        Tesseract.recognize(
+          currentImage,
+          lang,
+          {
+            logger: m => {
+              if (m.status === 'recognizing text') {
+                const progress = Math.round(m.progress * 100);
+                progressBar.style.width = `${progress}%`;
+                progressStatus.textContent = `Processing: ${progress}%`;
+              } else {
+                progressStatus.textContent = m.status;
+              }
+            }
+          }
+        ).then(({ data: { text } }) => {
+          result.value = text;
+          progressContainer.style.display = 'none';
+          showNotification('Text extraction completed!');
+        }).catch(err => {
+          console.error(err);
+          progressContainer.style.display = 'none';
+          showNotification('Error extracting text. Please try again.');
+        });
+      }
+
+      function copyText() {
+        if (!result.value) {
+          showNotification('No text to copy');
+          return;
+        }
+        
+        result.select();
+        document.execCommand('copy');
+        showNotification('Text copied to clipboard!');
+      }
+
+      function downloadText() {
+        if (!result.value) {
+          showNotification('No text to download');
+          return;
+        }
+        
+        const blob = new Blob([result.value], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'extracted-text.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotification('Text file downloaded!');
+      }
+
+      function clearAll() {
+        fileInput.value = '';
+        previewWrap.style.display = 'none';
+        result.value = '';
+        currentImage = null;
+        progressContainer.style.display = 'none';
+      }
+
+      function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle('dark-mode');
+        
+        if (isDarkMode) {
+          darkModeToggle.innerHTML = '<span>☀️</span> Light Mode';
+        } else {
+          darkModeToggle.innerHTML = '<span>🌙</span> Dark Mode';
+        }
+        
+        localStorage.setItem('darkMode', isDarkMode);
+      }
+
+      function showNotification(message) {
+        notification.textContent = message;
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+
+      // Allow pasting images
+      document.addEventListener('paste', (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            handleFile(file);
+            break;
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>
