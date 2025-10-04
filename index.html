@@ -234,19 +234,14 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>OTP Generator</h1>
-        <p class="subtitle">Generate secure One-Time Passwords using numbers and alphabets</p>
-        
-        <div class="otp-display" id="otpDisplay">
-            Click Generate
-        </div>
-        
-        <div class="controls">
-            <div class="length-control">
-                <label for="length">OTP Length:</label>
-                <input type="range" id="length" min="4" max="12" value="6">
-                <span class="length-value" id="lengthValue">6</span>
+
+    <div class="app">
+        <header>
+            <h1>Image to Text Extractor</h1>
+            <p>Extract text from images locally and translate it to Hindi.</p>
+            <div class="header-buttons">
+                <button id="historyBtn" class="primary">History</button>
+                <button id="darkModeToggle" class="primary">Dark Mode</button>
             </div>
             
             <div class="options">
@@ -256,34 +251,35 @@
                         <label for="uppercase">Include Uppercase Letters (A-Z)</label>
                     </div>
                 </div>
-                
-                <div class="option">
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="lowercase" checked>
-                        <label for="lowercase">Include Lowercase Letters (a-z)</label>
+            </div>
+
+            <div class="result-container">
+                <div class="result">
+                    <textarea id="result" placeholder="Extracted text will appear here..."></textarea>
+                    <div class="textarea-footer">
+                        <div id="resultCharCount" class="char-count">0 characters</div>
+                        <div class="actions">
+                            <button id="readOriginalBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                            <button id="copyBtn" title="Copy Text"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
+                            <button id="downloadBtn" title="Download .txt"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg></button>
+                            <button id="clearBtn" title="Clear All"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></button>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="option">
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="numbers" checked>
-                        <label for="numbers">Include Numbers (0-9)</label>
+
+                <div class="translation-section">
+                    <textarea id="translatedResult" placeholder="Translation will appear here..."></textarea>
+                    <div class="textarea-footer">
+                        <div id="translatedCharCount" class="char-count">0 characters</div>
+                        <div class="actions">
+                            <button id="readTranslatedBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                            <button id="copyTranslationBtn" title="Copy Translation"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
+                            <button id="translateBtn" class="primary">Translate to Hindi</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="buttons">
-            <button class="generate-btn" id="generateBtn">Generate OTP</button>
-            <button class="copy-btn" id="copyBtn">Copy OTP</button>
-        </div>
-        
-        <div class="history">
-            <h3>Recent OTPs</h3>
-            <div class="history-list" id="historyList">
-                <!-- OTP history will be added here -->
-            </div>
-        </div>
+        </main>
     </div>
     
     <div class="notification" id="notification">OTP copied to clipboard!</div>
@@ -426,40 +422,17 @@
             <p>Don't have an account? <a href="#">Sign up</a></p>
             <p><a href="#">Forgot your password?</a></p>
         </div>
+        <ul id="historyList"></ul>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            let isValid = true;
-            
-            // Reset error messages
-            document.getElementById('usernameError').style.display = 'none';
-            document.getElementById('emailError').style.display = 'none';
-            
-            // Validate username
-            if (username.trim() === '') {
-                document.getElementById('usernameError').style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validate email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            }
-            
-            if (isValid) {
-                // In a real application, you would send the data to a server here
-                alert('Login successful!');
-                // Reset form
-                document.getElementById('loginForm').reset();
-            }
-        });
-    </script>
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <p>Recognizing text...</p>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js'></script>
+    <script src="app.js"></script>
 </body>
 </html>
