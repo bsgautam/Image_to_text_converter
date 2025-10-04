@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>OTP Generator</title>
     <style>
         * {
             margin: 0;
@@ -13,140 +13,414 @@
         }
         
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
         }
         
-        .login-container {
+        .container {
             background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             padding: 30px;
-        }
-        
-        .login-header {
             text-align: center;
-            margin-bottom: 30px;
         }
         
-        .login-header h1 {
+        h1 {
             color: #333;
-            font-size: 28px;
             margin-bottom: 10px;
+            font-size: 28px;
         }
         
-        .login-header p {
+        .subtitle {
             color: #666;
-            font-size: 14px;
+            margin-bottom: 30px;
+            font-size: 16px;
         }
         
-        .form-group {
-            margin-bottom: 20px;
+        .otp-display {
+            background-color: #f5f9ff;
+            border: 2px dashed #2575fc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: #2575fc;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .length-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
         label {
-            display: block;
-            margin-bottom: 8px;
             color: #555;
             font-weight: 500;
         }
         
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+        input[type="range"] {
+            width: 60%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #e0e0e0;
             border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus,
-        input[type="email"]:focus {
-            border-color: #4a90e2;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
         }
         
-        .login-button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4a90e2;
-            color: white;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2575fc;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .length-value {
+            font-weight: bold;
+            color: #2575fc;
+            min-width: 30px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #2575fc;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
         }
         
-        .login-button:hover {
-            background-color: #3a7bc8;
+        .generate-btn {
+            background-color: #2575fc;
+            color: white;
         }
         
-        .login-footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
+        .generate-btn:hover {
+            background-color: #1c68e3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
         }
         
-        .login-footer a {
-            color: #4a90e2;
-            text-decoration: none;
+        .copy-btn {
+            background-color: #f0f4ff;
+            color: #2575fc;
+            border: 2px solid #2575fc;
         }
         
-        .login-footer a:hover {
-            text-decoration: underline;
+        .copy-btn:hover {
+            background-color: #e1eaff;
         }
         
-        .error-message {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .history {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .history h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
         }
         
         @media (max-width: 480px) {
-            .login-container {
+            .container {
                 padding: 20px;
             }
             
-            .login-header h1 {
+            h1 {
                 font-size: 24px;
+            }
+            
+            .otp-display {
+                font-size: 24px;
+                padding: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Welcome Back</h1>
-            <p>Please sign in to your account</p>
+    <div class="container">
+        <h1>OTP Generator</h1>
+        <p class="subtitle">Generate secure One-Time Passwords using numbers and alphabets</p>
+        
+        <div class="otp-display" id="otpDisplay">
+            Click Generate
         </div>
         
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
-                <div class="error-message" id="usernameError">Please enter a valid username</div>
+        <div class="controls">
+            <div class="length-control">
+                <label for="length">OTP Length:</label>
+                <input type="range" id="length" min="4" max="12" value="6">
+                <span class="length-value" id="lengthValue">6</span>
             </div>
             
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                <div class="error-message" id="emailError">Please enter a valid email address</div>
+            <div class="options">
+                <div class="option">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="uppercase" checked>
+                        <label for="uppercase">Include Uppercase Letters (A-Z)</label>
+                    </div>
+                </div>
+                
+                <div class="option">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="lowercase" checked>
+                        <label for="lowercase">Include Lowercase Letters (a-z)</label>
+                    </div>
+                </div>
+                
+                <div class="option">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="numbers" checked>
+                        <label for="numbers">Include Numbers (0-9)</label>
+                    </div>
+                </div>
             </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="generate-btn" id="generateBtn">Generate OTP</button>
+            <button class="copy-btn" id="copyBtn">Copy OTP</button>
+        </div>
+        
+        <div class="history">
+            <h3>Recent OTPs</h3>
+            <div class="history-list" id="historyList">
+                <!-- OTP history will be added here -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">OTP copied to clipboard!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const otpDisplay = document.getElementById('otpDisplay');
+            const generateBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const lengthSlider = document.getElementById('length');
+            const lengthValue = document.getElementById('lengthValue');
+            const uppercaseCheckbox = document.getElementById('uppercase');
+            const lowercaseCheckbox = document.getElementById('lowercase');
+            const numbersCheckbox = document.getElementById('numbers');
+            const notification = document.getElementById('notification');
+            const historyList = document.getElementById('historyList');
             
-            <button type="submit" class="login-button">Sign In</button>
-        </form>
+            let otpHistory = [];
+            
+            // Update length value display
+            lengthSlider.addEventListener('input', function() {
+                lengthValue.textContent = this.value;
+            });
+            
+            // Generate OTP function
+            function generateOTP() {
+                const length = parseInt(lengthSlider.value);
+                const includeUppercase = uppercaseCheckbox.checked;
+                const includeLowercase = lowercaseCheckbox.checked;
+                const includeNumbers = numbersCheckbox.checked;
+                
+                // Validate that at least one character type is selected
+                if (!includeUppercase && !includeLowercase && !includeNumbers) {
+                    otpDisplay.textContent = "Select at least one character type";
+                    otpDisplay.style.color = "#ff5252";
+                    return;
+                }
+                
+                // Define character sets
+                let characters = '';
+                if (includeUppercase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                if (includeLowercase) characters += 'abcdefghijklmnopqrstuvwxyz';
+                if (includeNumbers) characters += '0123456789';
+                
+                // Generate OTP
+                let otp = '';
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * characters.length);
+                    otp += characters[randomIndex];
+                }
+                
+                // Display OTP
+                otpDisplay.textContent = otp;
+                otpDisplay.style.color = "#2575fc";
+                
+                // Add to history
+                addToHistory(otp);
+            }
+            
+            // Add OTP to history
+            function addToHistory(otp) {
+                const timestamp = new Date().toLocaleTimeString();
+                otpHistory.unshift({ otp, timestamp });
+                
+                // Keep only last 5 OTPs
+                if (otpHistory.length > 5) {
+                    otpHistory.pop();
+                }
+                
+                // Update history display
+                updateHistoryDisplay();
+            }
+            
+            // Update history display
+            function updateHistoryDisplay() {
+                historyList.innerHTML = '';
+                
+                otpHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <span>${item.otp}</span>
+                        <span style="color: #777; font-size: 12px;">${item.timestamp}</span>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+            }
+            
+            // Copy OTP to clipboard
+            function copyOTP() {
+                const otp = otpDisplay.textContent;
+                
+                // Check if OTP is valid
+                if (otp === "Click Generate" || otp === "Select at least one character type") {
+                    showNotification("Generate an OTP first!", "error");
+                    return;
+                }
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(otp).then(() => {
+                    showNotification("OTP copied to clipboard!");
+                }).catch(err => {
+                    console.error('Failed to copy OTP: ', err);
+                    showNotification("Failed to copy OTP", "error");
+                });
+            }
+            
+            // Show notification
+            function showNotification(message, type = "success") {
+                notification.textContent = message;
+                notification.className = "notification";
+                
+                if (type === "error") {
+                    notification.style.backgroundColor = "#ff5252";
+                } else {
+                    notification.style.backgroundColor = "#4caf50";
+                }
+                
+                setTimeout(() => {
+                    notification.classList.add("show");
+                }, 10);
+                
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                }, 3000);
+            }
+            
+            // Event listeners
+            generateBtn.addEventListener('click', generateOTP);
+            copyBtn.addEventListener('click', copyOTP);
+            
+            // Generate initial OTP
+            generateOTP();
+        });
+    </script>
+</body>
+</html>        </form>
         
         <div class="login-footer">
             <p>Don't have an account? <a href="#">Sign up</a></p>
