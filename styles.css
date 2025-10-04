@@ -24,6 +24,15 @@ body{
   box-shadow:0 8px 30px rgba(2,6,23,0.08);
   padding:20px;
 }
+body.dark-mode {
+  background: #121212;
+  color: #e0e0e0;
+}
+
+body.dark-mode button {
+  background: #333;
+  color: #fff;
+}
 header h1{margin:0;font-size:1.35rem}
 header p{margin:6px 0 18px;color:var(--muted)}
 main{display:grid;grid-template-columns:1fr 1fr;gap:18px}

@@ -24,6 +24,9 @@ fileInput.addEventListener('change', (e) => {
   const f = e.target.files[0];
   if (f) handleFile(f);
 });
+document.getElementById("darkModeToggle").addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+});
 
 function handleFile(file){
   if (!file.type.startsWith('image/')) return alert('Please select an image file.');
