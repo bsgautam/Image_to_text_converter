@@ -13,7 +13,10 @@
         <header>
             <h1>Image to Text Extractor</h1>
             <p>Extract text from images locally and translate it to Hindi.</p>
-            <button id="darkModeToggle" class="primary" style="position: absolute; top: 20px; right: 20px;">Toggle Dark Mode</button>
+            <div class="header-buttons">
+                <button id="historyBtn" class="primary">History</button>
+                <button id="darkModeToggle" class="primary">Toggle Dark Mode</button>
+            </div>
         </header>
 
         <main>
@@ -58,10 +61,19 @@
                 </div>
             </div>
         </main>
-
+        
         <footer>
             <p>Powered by Tesseract.js, running 100% in your browser.</p>
         </footer>
+    </div>
+    
+    <div id="historyPanel" class="history-panel">
+        <div class="history-header">
+            <h2>Translation History</h2>
+            <button id="clearHistoryBtn">Clear All</button>
+        </div>
+        <ul id="historyList">
+            </ul>
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js'></script>
