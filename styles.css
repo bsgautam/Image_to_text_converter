@@ -23,7 +23,7 @@ body{
   border-radius:12px;
   box-shadow:0 8px 30px rgba(2,6,23,0.08);
   padding:20px;
-  position: relative; /* Added for positioning dark mode toggle */
+  position: relative;
 }
 body.dark-mode {
   --bg: #121212;
@@ -65,20 +65,26 @@ footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
 .demo img{max-width:100%;border-radius:8px;border:1px solid #e6e9ef}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 
-/* NEW STYLES FOR TRANSLATION SECTION */
 .translation-section {
   margin-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
 #translatedResult {
   min-height: 150px;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #e6e9ef;
   resize: vertical;
-  font-family: 'Segoe UI', Arial, sans-serif; /* Better font for Hindi */
+  font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 1.1em;
+}
+
+/* NEW: Style for the SVG icon inside the read aloud buttons */
+.actions button svg {
+    fill: currentColor;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
 }

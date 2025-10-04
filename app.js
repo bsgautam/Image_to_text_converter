@@ -9,10 +9,13 @@ const clearBtn = document.getElementById('clearBtn');
 const langSelect = document.getElementById('langSelect');
 const darkModeToggle = document.getElementById('darkModeToggle');
 
-// Get references to the new translation elements
 const translateBtn = document.getElementById('translateBtn');
 const translatedResult = document.getElementById('translatedResult');
 const copyTranslationBtn = document.getElementById('copyTranslationBtn');
+
+// NEW: Get references for the new Text-to-Speech buttons
+const readOriginalBtn = document.getElementById('readOriginalBtn');
+const readTranslatedBtn = document.getElementById('readTranslatedBtn');
 
 let selectedFile = null;
 
@@ -84,12 +87,12 @@ clearBtn.addEventListener('click', () => {
   selectedFile = null;
   result.value = '';
   fileInput.value = '';
-  translatedResult.value = ''; // Clear translation result as well
+  translatedResult.value = ''; 
+  speechSynthesis.cancel(); // NEW: Stop any speech when clearing
 });
 
-// --- TRANSLATION LOGIC ---
 
-// Sample translation dictionary
+// --- TRANSLATION LOGIC ---
 const translationDictionary = {
     "hello": "नमस्ते", "good morning": "शुभ प्रभात", "how are you": "आप कैसे हैं",
     "thank you": "धन्यवाद", "please": "कृपया", "yes": "हाँ", "no": "नहीं",
@@ -101,38 +104,28 @@ const translationDictionary = {
     "car": "कार", "tree": "पेड़", "sun": "सूरज", "moon": "चाँद", "star": "तारा"
 };
 
-// Function to translate English text to Hindi
 function translateToHindi(text) {
     if (!text) return '';
-    
-    // Simple word-by-word translation for demo
-    // It splits by space and newline to handle multi-line text from OCR
     const words = text.toLowerCase().split(/[\s\n]+/); 
     const translatedText = words.map(word => {
-        // Remove punctuation for better matching
         const cleanWord = word.replace(/[.,!?;:"']/g, '');
         return translationDictionary[cleanWord] || word;
     }).join(' ');
-
     return translatedText;
 }
 
-// Event listener for the translate button
 translateBtn.addEventListener('click', () => {
     const textToTranslate = result.value;
     if (!textToTranslate || textToTranslate.startsWith('Recognizing text...')) {
         return alert('Please extract some text from an image first.');
     }
-    
     translatedResult.value = 'Translating...';
-    // Simulate a small delay
     setTimeout(() => {
         const translation = translateToHindi(textToTranslate);
         translatedResult.value = translation;
     }, 500);
 });
 
-// Event listener for copying the translated text
 copyTranslationBtn.addEventListener('click', async () => {
     if (!translatedResult.value || translatedResult.value === 'Translating...') return;
     try {
@@ -141,4 +134,31 @@ copyTranslationBtn.addEventListener('click', async () => {
     } catch (e) {
         alert('Unable to copy: ' + e.message);
     }
+});
+
+
+// --- NEW: TEXT-TO-SPEECH LOGIC ---
+
+function speakText(text, lang) {
+  // Stop any currently speaking utterance
+  speechSynthesis.cancel();
+  
+  if (!text) return; // Don't speak if text is empty
+
+  // Create a new speech utterance
+  const utterance = new SpeechSynthesisUtterance(text);
+  
+  // Set the language for correct pronunciation
+  utterance.lang = lang;
+  
+  // Speak the text
+  speechSynthesis.speak(utterance);
+}
+
+readOriginalBtn.addEventListener('click', () => {
+  speakText(result.value, 'en-US'); // Language code for US English
+});
+
+readTranslatedBtn.addEventListener('click', () => {
+  speakText(translatedResult.value, 'hi-IN'); // Language code for Hindi
 });
