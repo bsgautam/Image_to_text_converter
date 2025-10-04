@@ -23,15 +23,28 @@ body{
   border-radius:12px;
   box-shadow:0 8px 30px rgba(2,6,23,0.08);
   padding:20px;
+  position: relative; /* Added for positioning dark mode toggle */
 }
 body.dark-mode {
-  background: #121212;
+  --bg: #121212;
+  --card: #1e1e1e;
+  --muted: #9e9e9e;
   color: #e0e0e0;
 }
-
+body.dark-mode .app {
+    box-shadow: 0 8px 30px rgba(255,255,255,0.05);
+}
 body.dark-mode button {
   background: #333;
   color: #fff;
+}
+body.dark-mode .primary {
+    background: var(--accent);
+}
+body.dark-mode #result, body.dark-mode #translatedResult {
+    background-color: #222;
+    border-color: #444;
+    color: #e0e0e0;
 }
 header h1{margin:0;font-size:1.35rem}
 header p{margin:6px 0 18px;color:var(--muted)}
@@ -40,12 +53,32 @@ main{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .drop{padding:18px;border-radius:8px;background:linear-gradient(90deg,#fff,#f7fbff);text-align:center;cursor:pointer;border:1px dashed #d1d5db}
 #fileInput{display:none}
 .controls{display:flex;gap:8px;align-items:center;margin-top:10px}
-.primary{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.primary{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer; transition: background-color 0.2s;}
+.primary:hover { background: #4338ca; }
 #previewWrap{margin-top:12px;text-align:center}
 #preview{max-width:100%;max-height:220px;border-radius:8px;border:1px solid #e6e9ef}
+.result-container { display: flex; flex-direction: column; }
 .result{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:8px;border:1px solid #eef2ff;background:#fff}
 #result{flex:1;min-height:300px;padding:12px;border-radius:8px;border:1px solid #e6e9ef;resize:vertical;font-family:ui-monospace,monospace}
 .actions{display:flex;gap:8px}
 footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
 .demo img{max-width:100%;border-radius:8px;border:1px solid #e6e9ef}
 @media(max-width:900px){main{grid-template-columns:1fr}}
+
+/* NEW STYLES FOR TRANSLATION SECTION */
+.translation-section {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#translatedResult {
+  min-height: 150px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  resize: vertical;
+  font-family: 'Segoe UI', Arial, sans-serif; /* Better font for Hindi */
+  font-size: 1.1em;
+}

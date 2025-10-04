@@ -3,350 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English to Hindi Translator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            padding: 30px;
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-            font-weight: 600;
-        }
-        
-        .language-selector {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        
-        .language-box {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-bottom: 2px solid #e0e0e0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .language-box.active {
-            border-bottom: 2px solid #333;
-            font-weight: 600;
-        }
-        
-        .translation-area {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .input-container, .output-container {
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 15px;
-            min-height: 150px;
-            position: relative;
-        }
-        
-        .input-container {
-            background-color: #fafafa;
-        }
-        
-        .output-container {
-            background-color: white;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 120px;
-            border: none;
-            outline: none;
-            resize: none;
-            background: transparent;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        
-        .output-text {
-            min-height: 120px;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #333;
-        }
-        
-        .placeholder {
-            color: #999;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            pointer-events: none;
-        }
-        
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            background-color: #333;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        button:hover {
-            background-color: #555;
-        }
-        
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .swap-button {
-            background-color: transparent;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin: 0 auto;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .swap-button:hover {
-            background-color: #f0f0f0;
-        }
-        
-        .char-count {
-            text-align: right;
-            font-size: 14px;
-            color: #999;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-            }
-        }
-    </style>
+    <title>Image to Text with Hindi Translation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>English to Hindi Translator</h1>
-        
-        <div class="language-selector">
-            <div class="language-box active" id="english-box">English</div>
-            <div class="language-box" id="hindi-box">Hindi</div>
-        </div>
-        
-        <div class="translation-area">
-            <div class="input-container">
-                <textarea id="input-text" placeholder="Enter text to translate..."></textarea>
-                <div class="char-count"><span id="char-count">0</span>/500</div>
+
+    <div class="app">
+        <header>
+            <h1>Image to Text Extractor</h1>
+            <p>Extract text from images locally and translate it to Hindi.</p>
+            <button id="darkModeToggle" class="primary" style="position: absolute; top: 20px; right: 20px;">Toggle Dark Mode</button>
+        </header>
+
+        <main>
+            <div class="uploader">
+                <div id="dropZone" class="drop">
+                    <p>Drop an image here or click to upload</p>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+                <div class="controls">
+                    <select id="langSelect">
+                        <option value="eng" selected>English</option>
+                        </select>
+                    <button id="extractBtn" class="primary">Extract Text</button>
+                </div>
+                <div id="previewWrap">
+                    <img id="preview" src="" alt="Image preview">
+                </div>
             </div>
-            
-            <div class="swap-button" id="swap-languages">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8 7L3 12L8 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+
+            <div class="result-container">
+                <div class="result">
+                    <textarea id="result" placeholder="Extracted text will appear here..."></textarea>
+                    <div class="actions">
+                        <button id="copyBtn">Copy Text</button>
+                        <button id="downloadBtn">Download .txt</button>
+                        <button id="clearBtn">Clear</button>
+                    </div>
+                </div>
+
+                <div class="translation-section">
+                    <div class="actions">
+                        <button id="translateBtn" class="primary">Translate to Hindi</button>
+                        <button id="copyTranslationBtn">Copy Translation</button>
+                    </div>
+                    <textarea id="translatedResult" placeholder="Translation will appear here..."></textarea>
+                </div>
             </div>
-            
-            <div class="output-container">
-                <div class="output-text" id="output-text"></div>
-                <div class="placeholder" id="output-placeholder">Translation will appear here</div>
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <button id="translate-btn">Translate</button>
-            <button id="clear-btn">Clear</button>
-        </div>
+        </main>
+
+        <footer>
+            <p>Powered by Tesseract.js, running 100% in your browser.</p>
+        </footer>
     </div>
 
-    <script>
-        // DOM Elements
-        const inputText = document.getElementById('input-text');
-        const outputText = document.getElementById('output-text');
-        const outputPlaceholder = document.getElementById('output-placeholder');
-        const translateBtn = document.getElementById('translate-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const swapBtn = document.getElementById('swap-languages');
-        const englishBox = document.getElementById('english-box');
-        const hindiBox = document.getElementById('hindi-box');
-        const charCount = document.getElementById('char-count');
-        
-        // Translation direction
-        let isEnglishToHindi = true;
-        
-        // Character limit
-        const MAX_CHARS = 500;
-        
-        // Sample translation dictionary (in a real app, this would be an API call)
-        const translationDictionary = {
-            "hello": "नमस्ते",
-            "good morning": "शुभ प्रभात",
-            "how are you": "आप कैसे हैं",
-            "thank you": "धन्यवाद",
-            "please": "कृपया",
-            "yes": "हाँ",
-            "no": "नहीं",
-            "water": "पानी",
-            "food": "खाना",
-            "friend": "दोस्त",
-            "family": "परिवार",
-            "love": "प्यार",
-            "peace": "शांति",
-            "beautiful": "सुंदर",
-            "india": "भारत",
-            "language": "भाषा",
-            "translate": "अनुवाद करना",
-            "computer": "कंप्यूटर",
-            "internet": "इंटरनेट",
-            "mobile": "मोबाइल",
-            "book": "किताब",
-            "pen": "कलम",
-            "school": "स्कूल",
-            "teacher": "शिक्षक",
-            "student": "छात्र",
-            "house": "घर",
-            "car": "कार",
-            "tree": "पेड़",
-            "sun": "सूरज",
-            "moon": "चाँद",
-            "star": "तारा"
-        };
-        
-        // Event Listeners
-        inputText.addEventListener('input', updateCharCount);
-        translateBtn.addEventListener('click', translateText);
-        clearBtn.addEventListener('click', clearText);
-        swapBtn.addEventListener('click', swapLanguages);
-        
-        // Update character count
-        function updateCharCount() {
-            const count = inputText.value.length;
-            charCount.textContent = count;
-            
-            if (count > MAX_CHARS) {
-                charCount.style.color = '#e74c3c';
-                translateBtn.disabled = true;
-            } else {
-                charCount.style.color = '#999';
-                translateBtn.disabled = false;
-            }
-        }
-        
-        // Translate text
-        function translateText() {
-            const text = inputText.value.trim();
-            
-            if (!text) {
-                outputText.textContent = '';
-                outputPlaceholder.style.display = 'block';
-                return;
-            }
-            
-            // Show loading state
-            outputText.textContent = 'Translating...';
-            outputPlaceholder.style.display = 'none';
-            
-            // Simulate API delay
-            setTimeout(() => {
-                let translatedText = '';
-                
-                if (isEnglishToHindi) {
-                    // Simple word-by-word translation for demo
-                    const words = text.toLowerCase().split(' ');
-                    translatedText = words.map(word => {
-                        return translationDictionary[word] || word;
-                    }).join(' ');
-                } else {
-                    // Reverse translation for demo (Hindi to English)
-                    const reverseDict = {};
-                    for (const [key, value] of Object.entries(translationDictionary)) {
-                        reverseDict[value] = key;
-                    }
-                    
-                    const words = text.split(' ');
-                    translatedText = words.map(word => {
-                        return reverseDict[word] || word;
-                    }).join(' ');
-                }
-                
-                outputText.textContent = translatedText;
-                outputPlaceholder.style.display = 'none';
-            }, 800);
-        }
-        
-        // Clear text
-        function clearText() {
-            inputText.value = '';
-            outputText.textContent = '';
-            outputPlaceholder.style.display = 'block';
-            charCount.textContent = '0';
-            charCount.style.color = '#999';
-            translateBtn.disabled = false;
-        }
-        
-        // Swap languages
-        function swapLanguages() {
-            isEnglishToHindi = !isEnglishToHindi;
-            
-            if (isEnglishToHindi) {
-                englishBox.classList.add('active');
-                hindiBox.classList.remove('active');
-            } else {
-                hindiBox.classList.add('active');
-                englishBox.classList.remove('active');
-            }
-            
-            // Clear current translation
-            clearText();
-        }
-    </script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js'></script>
+    <script src="app.js"></script>
 </body>
 </html>
