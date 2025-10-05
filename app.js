@@ -145,13 +145,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Translation ---
-    const translationDictionary = { "hello": "नमस्ते", "good morning": "शुभ प्रभात", "how are you": "आप कैसे हैं", "thank you": "धन्यवाद", "please": "कृपया", "yes": "हाँ", "no": "नहीं", "love": "प्यार", "friend": "दोस्त"};
-    function performTranslation() {
+    async function performTranslation() {
         const textToTranslate = resultDiv.textContent.trim();
         if (!textToTranslate) return showToast('Nothing to translate.');
-        const translatedText = textToTranslate.toLowerCase().split(/[\s\n]+/).map(w => translationDictionary[w.replace(/[.,!?;:"']/g, '')] || w).join(' ');
-        translatedResultDiv.textContent = translatedText;
-        saveToHistory(resultDiv.innerHTML, translatedText); // Save original HTML and translated text
+        translatedResultDiv.textContent = 'Translating...';
+        try {
+            const translatedText = await translateText(textToTranslate, 'hi', 'en');
+            translatedResultDiv.textContent = translatedText;
+            saveToHistory(resultDiv.innerHTML, translatedText); // Save original HTML and translated text
+        } catch (err) {
+            translatedResultDiv.textContent = 'Translation failed.';
+            showToast('Translation error.');
+        }
     }
 
     // --- Action & Helper Functions ---
