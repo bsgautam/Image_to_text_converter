@@ -15,7 +15,8 @@
     <!-- Main Application Container -->
     <div class="app">
         <header>
-            <h1>Advanced Image to Text Tool</h1>
+            <!-- Updated H1 with ID for typing effect -->
+            <h1 id="typing-header"></h1>
             <p>Extract, translate, and interact with text from images or your live camera.</p>
             <div class="header-buttons">
                 <button id="historyBtn" class="primary">History</button>
@@ -45,10 +46,19 @@
                     <div class="textarea-footer">
                         <div id="resultCharCount" class="char-count">0 characters</div>
                         <div class="actions">
-                            <button id="readOriginalBtn" title="Read Aloud"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
-                            <button id="copyBtn" title="Copy Text"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button>
-                            <button id="downloadBtn" title="Download .txt"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg></button>
-                            <button id="clearBtn" title="Clear All"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></button>
+                            <!-- Data attribute stores default HTML for feedback reset -->
+                            <button id="readOriginalBtn" title="Read Aloud" data-default-html='<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>
+                            </button>
+                            <button id="copyBtn" title="Copy Text" data-default-html='<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg>
+                            </button>
+                            <button id="downloadBtn" title="Download .txt" data-default-html='<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
+                            </button>
+                            <button id="clearBtn" title="Clear All" data-default-html='<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -62,6 +72,7 @@
         </main>
     </div>
     
+
     <!-- History Panel -->
     <div id="historyPanel" class="history-panel">
         <div class="history-header">
@@ -106,13 +117,73 @@
         </div>
     </div>
 
+    <!-- Download Options Modal -->
+    <div id="downloadModal" class="modal-overlay">
+        <div class="modal-content download-content">
+            <h2>Select Download Format</h2>
+            <div class="download-options-grid">
+                
+                <!-- TXT Download -->
+                <div class="download-option" data-format="txt">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9"></polyline></svg>
+                    <span class="format-name">Plain Text</span>
+                    <span class="format-type">(.txt)</span>
+                </div>
+
+                <!-- PDF Download (Now supported with jsPDF) -->
+                <div class="download-option" data-format="pdf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                    <span class="format-name">PDF Document</span>
+                    <span class="format-type">(.pdf)</span>
+                </div>
+                
+                <!-- DOCX Download (Now basic Word-compatible supported) -->
+                <div class="download-option" data-format="docx">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline><line x1="10" y1="12" x2="14" y2="12"></line><line x1="12" y1="12" x2="12" y2="16"></line></svg>
+                    <span class="format-name">Word Document</span>
+                    <span class="format-type">(.doc)</span>
+                </div>
+
+                <!-- Placeholder for future support -->
+                <div class="download-option" data-format="unsupported">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>
+                    <span class="format-name">Other Formats</span>
+                    <span class="format-type">(Future Support)</span>
+                </div>
+
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDownloadBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Utility Services -->
     <script src="services/translationService.js"></script>
     <script src="util/otpGenerator.js"></script>
     <!-- Main Application Logic -->
     <script src="app.js"></script>
+
+    <!-- Mock Translation Service -->
+    <script>
+        // Mock translateText function (services/translationService.js content)
+        async function translateText(text, targetLang, sourceLang) {
+            // Simple mock: Reverse text for demonstration
+            await new Promise(resolve => setTimeout(resolve, 500)); 
+            
+            // Check for specific text to provide a realistic response for demo
+            if (text.includes("Advanced Image to Text Tool")) {
+                return "उन्नत छवि से पाठ उपकरण"; 
+            }
+            
+            // Generic fallback: Reverse the text content
+            return "अनुवाद सफल रहा: " + text.split('').reverse().join('');
+        }
+    </script>
+
 </body>
 </html>
