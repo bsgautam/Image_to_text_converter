@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultDiv = document.getElementById("result");
   const darkModeToggle = document.getElementById("darkModeToggle");
   const typingHeader = document.getElementById("typing-header"); // For typing effect
+  const ocrLangSelect = document.getElementById("ocrLangSelect"); // NEW: Language Selector
   // Modals & Overlays
   const cropperModal = document.getElementById("cropperModal");
   const cameraModal = document.getElementById("cameraModal");
@@ -294,22 +295,36 @@ document.addEventListener("DOMContentLoaded", () => {
     performOCR(canvas);
   }
 
-  // --- Core OCR & Interactive Text ---
+  // --- Core OCR & Interactive Text (UPDATED for Auto-Detect) ---
   async function performOCR(imageSource) {
     loader.classList.add("show");
+    const selectedLang = ocrLangSelect.value;
+    let langCode = selectedLang;
+
+    // Handle "Auto-Detect" by using multiple common language packs
+    if (selectedLang === 'auto') {
+        // Use a combination of common, high-accuracy languages
+        langCode = 'eng+spa+fra'; 
+        loader.querySelector('p').textContent = `Recognizing text (Auto-Detect: trying ${langCode})...`;
+    } else {
+        loader.querySelector('p').textContent = `Recognizing text (Language: ${selectedLang})...`;
+    }
+
     try {
       const {
         data: { text },
-      } = await Tesseract.recognize(imageSource, "eng");
+      } = await Tesseract.recognize(imageSource, langCode);
+
       const interactiveText = createInteractiveText(text);
       resultDiv.innerHTML = interactiveText;
       updateCharCount(resultDiv, resultCharCount);
     } catch (err) {
       console.error(err);
-      resultDiv.textContent = "Error during text recognition.";
+      resultDiv.textContent = "Error during text recognition. Please try selecting a specific language.";
       showToast("Could not recognize text.");
     } finally {
       loader.classList.remove("show");
+      loader.querySelector('p').textContent = "Recognizing text..."; // Reset loader text
     }
   }
 
@@ -332,8 +347,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const textToTranslate = resultDiv.textContent.trim();
     if (!textToTranslate) return showToast("Nothing to translate.");
     translatedResultDiv.textContent = "Translating...";
+    
+    // In a real app, you would determine sourceLang (e.g., from OCR output or a second selector)
+    // and let the user select targetLang (e.g., "hi" for Hindi from a selector)
     try {
-      const translatedText = await translateText(textToTranslate, "hi", "en");
+      // Mock call to translation service. Target is hardcoded to "hi" (Hindi) as per original button text.
+      const translatedText = await translateText(textToTranslate, "hi", "auto"); 
       translatedResultDiv.textContent = translatedText;
       saveToHistory(resultDiv.innerHTML, translatedText); // Save original HTML and translated text
     } catch (err) {
