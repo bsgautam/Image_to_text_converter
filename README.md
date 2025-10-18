@@ -1,4 +1,4 @@
-# 🖼️➡️📝 Image to Text Converter (Web App)
+# 🖼️➡️📝 Image to Text Converter (Web App) 
 
 A simple, client-side Image → Text converter using **Tesseract.js**.  
 🖱️ Drag & drop images or use the file picker, then extract editable text **right in your browser**.  
