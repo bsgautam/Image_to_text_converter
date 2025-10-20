@@ -10,7 +10,7 @@ A simple, client-side Image → Text converter using **Tesseract.js**.
 - 🌐 Language selection: **English**, **Hindi**, **Spanish**, **French** (add more via language codes)  
 
 
-## How to contribute  
+## How to contribute   
 
 New to open source?
  Welcome, focused improvements are perfect. 
