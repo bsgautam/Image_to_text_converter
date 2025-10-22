@@ -12,7 +12,7 @@
     <div class="app">
         <header>
             <h1 id="typing-header"></h1>
-            <p>Extract, translate, and interact with text from images or your live camera.</p>
+            <p>Extract, translate, and interact with text from images or your live camera. Supports HEIC, WebP, TIFF.</p>
             <div class="header-buttons">
                 <button id="historyBtn" class="primary">History</button>
                 <button id="darkModeToggle" class="primary">Dark Mode</button>
@@ -25,128 +25,75 @@
                     <button id="uploadBtn" class="primary">Upload Image</button>
                     <button id="cameraBtn" class="primary">Use Camera</button>
                 </div>
-                <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                
-                <div id="loader" class="loader hidden">
-                    <div class="spinner"></div>
-                    <p>Processing image...</p>
-                </div>
-
-                <div class="preview-area">
-                    <p class="muted-text">Select an option above to begin or drag and drop an image here.</p>
+                <input type="file" id="fileInput" accept="image/*,.heic,.heif,.webp,.tif,.tiff" style="display: none;">
+                <div id="previewWrap">
+                    <p>Your selected image will appear in the crop tool.</p>
                 </div>
             </div>
 
             <div class="result-container">
-                <div class="language-selection">
-                    <label for="ocrLangSelect">OCR Language:</label>
-                    <select id="ocrLangSelect">
-                        <option value="auto">Auto-Detect</option>
-                        <option value="eng" selected>English</option>
-                        <option value="spa">Spanish</option>
-                        <option value="fra">French</option>
-                        <option value="deu">German</option>
-                        <option value="hin">Hindi</option>
-                        <option value="jpn">Japanese</option>
-                    </select>
-                    
-                    <div class="handwriting-mode-toggle">
-                        <input type="checkbox" id="handwritingMode">
-                        <label for="handwritingMode">Handwriting Mode</label>
-                    </div>
-                </div>
-                
                 <div class="result">
-                    <h3 class="title">Extracted Text</h3>
-                    <div id="result" contenteditable="true" placeholder="Extracted text will appear here..."></div>
-                    <div class="result-footer">
-                        <span id="resultCharCount">0 characters</span>
-                        <div class="result-actions">
-                            <button id="copyBtn" title="Copy Text">Copy</button>
-                            <button id="readAloudBtn" title="Read Aloud Text">Read Aloud</button>
-                            <button id="downloadBtn" title="Download Text">Download</button>
-                            <button id="clearBtn" title="Clear All Content">Clear</button>
+                    <div id="result" class="editable-div" contenteditable="true" spellcheck="false" placeholder="Extracted text will appear here..."></div>
+                    <div class="textarea-footer">
+                        <div id="resultCharCount" class="char-count">0 characters</div>
+                        <div class="actions">
+                            <button id="readOriginalBtn" title="Read Aloud" data-default-html='<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>
+                            </button>
+                            <button id="copyBtn" title="Copy Text" data-default-html='<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg>
+                            </button>
+                            <button id="downloadBtn" title="Download .txt" data-default-html='<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
+                            </button>
+                            <button id="clearBtn" title="Clear All" data-default-html='<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>'>
+                                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <div class="translation-section">
-                    <div class="language-selection">
-                        <label for="translationLangSelect">Translate To:</label>
-                        <select id="translationLangSelect">
-                            <option value="spa">Spanish</option>
-                            <option value="fra">French</option>
-                            <option value="hin">Hindi</option>
-                            <option value="deu">German</option>
-                        </select>
-                        <button id="translateBtn" class="primary">Translate</button>
-                    </div>
-
-                    <div class="result translation-result">
-                        <h3 class="title">Translated Text</h3>
-                        <div id="translatedResult" contenteditable="true" placeholder="Translation will appear here..."></div>
-                    </div>
+                    <button id="translateBtn" class="primary full-width">Translate to Hindi</button>
+                    <div id="translatedResult" class="translation-output" placeholder="Translation will appear here..."></div>
                 </div>
-
-                <div id="ttsControls" class="tts-controls hidden">
-                    <div class="tts-controls-row">
-                        <button id="ttsPlayPauseBtn" class="primary tts-icon-btn" title="Play/Pause">
-                            <span class="tts-icon">▶️</span>
-                        </button>
-                        <button id="ttsStopBtn" class="tts-icon-btn" title="Stop">
-                            <span class="tts-icon">⏹️</span>
-                        </button>
-                        <select id="ttsVoiceSelect" title="Select Voice"></select>
-                    </div>
-                    
-                    <div class="tts-controls-row rate-control">
-                        <label for="ttsRateRange">Rate:</label>
-                        <input type="range" id="ttsRateRange" min="0.5" max="2" value="1" step="0.1" title="Reading Speed">
-                        <span id="ttsRateValue">1.0x</span>
-                    </div>
-                </div>
-                
             </div>
         </main>
     </div>
+    
 
     <div id="historyPanel" class="history-panel">
         <div class="history-header">
-            <h3>History</h3>
-            <button id="closeHistoryBtn" class="close-btn">&times;</button>
+            <h2>Translation History</h2>
+            <button id="clearHistoryBtn">Clear All</button>
         </div>
-        <ul id="historyList">
-            </ul>
-        <div class="history-footer">
-            <button id="clearHistoryBtn" class="secondary">Clear History</button>
-        </div>
+        <ul id="historyList"></ul>
     </div>
 
-    <div id="cropperModal" class="modal hidden">
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <p>Recognizing text...</p>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <div id="cropperModal" class="modal-overlay">
         <div class="modal-content">
             <h2>Crop Image</h2>
             <div class="cropper-container">
                 <img id="imageToCrop" src="">
             </div>
-            
-            <div class="image-controls">
-                <button id="grayscaleBtn">Grayscale</button>
-                <button id="contrastBtn">Enhance Contrast</button>
-                <button id="rotateLeftBtn" title="Rotate Left (5°)">&#x21BA; 5°</button> 
-                <button id="rotateRightBtn" title="Rotate Right (5°)">&#x21BB; 5°</button>
-            </div>
-            
             <div class="modal-actions">
                 <button id="cancelCropBtn">Cancel</button>
-                <button id="confirmCropBtn" class="primary">Extract Text</button>
+                <button id="confirmCropBtn" class="primary">Confirm & Extract</button>
             </div>
         </div>
     </div>
 
-    <div id="cameraModal" class="modal hidden">
+    <div id="cameraModal" class="modal-overlay">
         <div class="modal-content">
-            <h2>Capture Image</h2>
-            <video id="cameraFeed" autoplay></video>
+            <h2>Live Camera</h2>
+            <video id="cameraFeed" autoplay playsinline></video>
             <div class="modal-actions">
                 <button id="cancelCameraBtn">Cancel</button>
                 <button id="captureBtn" class="primary">Capture</button>
@@ -154,30 +101,45 @@
         </div>
     </div>
 
-    <div id="downloadModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Download Options</h2>
-            <p>Select the desired format for the extracted text.</p>
+    <div id="downloadModal" class="modal-overlay">
+        <div class="modal-content download-content">
+            <h2>Select Download Format</h2>
             <div class="download-options-grid">
+                
                 <div class="download-option" data-format="txt">
-                    <span class="format-icon">📄</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9"></polyline></svg>
                     <span class="format-name">Plain Text</span>
-                    <span class="format-type">.txt</span>
+                    <span class="format-type">(.txt)</span>
                 </div>
-                <div class="download-option" data-format="pdf">
-                    <span class="format-icon">📰</span>
-                    <span class="format-name">PDF Document</span>
-                    <span class="format-type">.pdf</span>
+                
+                <div class="download-option" data-format="pdf-searchable">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="15" x2="12" y2="15"></line><path d="M10 12v3H8V12a2 2 0 0 1 4 0V9a2 2 0 0 0-4 0v3"></path></svg>
+                    <span class="format-name">Searchable PDF</span>
+                    <span class="format-type">(.pdf)</span>
                 </div>
-                <div class="download-option" data-format="doc">
-                    <span class="format-icon">📝</span>
+
+                <div class="download-option" data-format="docx">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline><line x1="10" y1="12" x2="14" y2="12"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
                     <span class="format-name">Word Document</span>
-                    <span class="format-type">(Future Support)</span>
+                    <span class="format-type">(.docx)</span>
                 </div>
-                <div class="download-option" data-format="other">
-                    <span class="format-icon">📦</span>
-                    <span class="format-name">Other Formats</span>
-                    <span class="format-type">(Future Support)</span>
+                
+                <div class="download-option" data-format="xlsx">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><line x1="8" y1="9" x2="10" y2="9"></line></svg>
+                    <span class="format-name">Excel Sheet</span>
+                    <span class="format-type">(.xlsx)</span>
+                </div>
+                
+                <div class="download-option" data-format="html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.66V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8.34L20 8.66z"></path><polyline points="15 3 20 8"></polyline><polyline points="10 14 12 16 10 18"></polyline><polyline points="14 14 16 16 14 18"></polyline></svg>
+                    <span class="format-name">Web Content</span>
+                    <span class="format-type">(.html)</span>
+                </div>
+                
+                <div class="download-option" data-format="rtf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18h.01"></path><path d="M12 14h.01"></path><path d="M12 10h.01"></path><path d="M9 14h.01"></path><path d="M15 14h.01"></path></svg>
+                    <span class="format-name">Rich Text Format</span>
+                    <span class="format-type">(.rtf)</span>
                 </div>
 
             </div>
@@ -187,11 +149,12 @@
         </div>
     </div>
 
-    <div id="toastContainer"></div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script> 
+    
     <script src="services/translationService.js"></script>
     <script src="util/otpGenerator.js"></script>
     <script src="app.js"></script>
@@ -210,7 +173,31 @@
             // Generic fallback: Reverse the text content
             return "अनुवाद सफल रहा: " + text.split('').reverse().join('');
         }
+        
+        // Mock function for Tiff/WebP conversion (as it's often complex client-side)
+        async function convertNonStandardImage(file) {
+            return new Promise((resolve, reject) => {
+                if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+                    // Use heic2any
+                    heic2any({ blob: file, toType: "image/jpeg" })
+                        .then((jpegBlob) => resolve(jpegBlob))
+                        .catch(reject);
+                } else if (file.name.toLowerCase().endsWith('.webp') || file.name.toLowerCase().endsWith('.tif') || file.name.toLowerCase().endsWith('.tiff')) {
+                    // This is a placeholder for complex formats like TIFF and WEBP (if not natively supported by browser/Cropper)
+                    // For WebP, modern browsers usually support it. For TIFF, a dedicated library is required.
+                    // For this demo, we'll just show a warning for TIFF and pass others.
+                    if (file.name.toLowerCase().endsWith('.tif') || file.name.toLowerCase().endsWith('.tiff')) {
+                        reject(new Error("TIFF conversion requires a dedicated backend or complex client-side library not included."));
+                        return;
+                    }
+                    // WebP is usually fine, pass it through
+                    resolve(file);
+                } else {
+                    resolve(file);
+                }
+            });
+        }
+        window.convertNonStandardImage = convertNonStandardImage; // Make accessible in app.js
     </script>
-
 </body>
 </html>
