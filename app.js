@@ -124,6 +124,15 @@ document.addEventListener("DOMContentLoaded", () => {
   historyBtn.addEventListener("click", () =>
     historyPanel.classList.toggle("show")
   );
+  document.addEventListener("click", (e) => {
+    if (
+      historyPanel.classList.contains("show") &&
+      !historyPanel.contains(e.target) &&
+      e.target !== historyBtn
+    ) {
+      historyPanel.classList.remove("show");
+    }
+  });
   clearHistoryBtn.addEventListener("click", clearHistory);
 
   // --- Button Feedback Function (Unchanged) ---
