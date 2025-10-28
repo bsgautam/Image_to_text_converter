@@ -78,9 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
   uploadBtn.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
   cameraBtn.addEventListener("click", startCamera);
-  darkModeToggle.addEventListener("click", () =>
-    document.body.classList.toggle("dark-mode")
-  );
+  darkModeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    if (darkModeToggle.textContent === "Dark Mode") {
+      darkModeToggle.textContent = "Light Mode";
+    } else {
+      darkModeToggle.textContent = "Dark Mode";
+    }
+  });
 
   // Modal Controls
   cancelCropBtn.addEventListener("click", closeCropper);
